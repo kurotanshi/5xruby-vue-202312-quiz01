@@ -13,6 +13,7 @@ const movies = ref(items);
 
 <template>
 <div class="app">
+  <!--v-for?star狀態-->
   <div class="movie-list">
     <div class="movie-item">
       <div class="movie-item-image-wrapper">
