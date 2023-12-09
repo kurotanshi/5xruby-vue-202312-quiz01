@@ -34,6 +34,25 @@ const timeFormat = (val) => {
     站點名稱搜尋: <input type="text">
   </p>
 
+<nav>
+  <ul class="pagination">
+    <li class="page-item">
+      <span class="page-link">Previous</span>
+    </li>
+
+    <li
+      v-for="i in 10" :key="i"
+      class="page-item">
+      <span class="page-link">{{ i }}</span>
+    </li>
+
+    <li class="page-item">
+      <span class="page-link" href>Next</span>
+    </li>
+  </ul>
+</nav>
+
+
   <table class="table table-striped">
     <thead>
       <tr>
@@ -63,6 +82,7 @@ const timeFormat = (val) => {
     </tbody>
   </table>
 </div>
+
 </template>
 
 <style scoped>
