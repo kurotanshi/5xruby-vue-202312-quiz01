@@ -9,8 +9,11 @@
   import { items } from "./movies.json";
 
   const movies = ref(items);
-  const rating = ((id) => {
-    
+  const changeRating = ((moviesIndex, star) => {
+    console.log('star',star);
+    console.log('moviesIndex',moviesIndex -1);
+    console.log(movies.value[moviesIndex - 1].rating);
+    movies.value[moviesIndex - 1].rating = star;
   })
 </script>
 
@@ -18,7 +21,7 @@
 <div class="app">
   <!--v-for?star狀態-->
   <div class="movie-list">
-    <div class="movie-item" v-for="movie in movies" :key="movie.id">
+    <div class="movie-item" v-for="(movie) in movies" :key="movie.id">
       <div class="movie-item-image-wrapper">
         <img :src="movie.image" alt="">
       </div>
@@ -39,11 +42,11 @@
           
           <div class="movie-item-star-icon-wrapper">
               <button class="movie-item-star-icon-button" 
-                      v-for="star in 5" 
+                      v-for="(star) in 5" 
                       :key="star" 
                       :class="star <= movie.rating ? 'text-yellow-500' : 'text-gray-500'" 
                       :value="star"
-                      >
+                      @click="changeRating(movie.id, star)">
                 <StarIcon class="movie-item-star-icon"/>
               </button>
           </div>
