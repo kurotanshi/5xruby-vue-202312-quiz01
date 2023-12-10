@@ -9,13 +9,17 @@
   import { items } from "./movies.json";
 
   const movies = ref(items);
+  const setRating = (movie, newRating) => {
+    const movieToUpdate = movies.value.find(m => m.id === movie.id);
+    if (movieToUpdate) movieToUpdate.rating = newRating;
+  };
 </script>
 
 <template>
   <div class="app">
     <div class="movie-list">
       <div class="movie-item"
-        v-for="movie in items" 
+        v-for="movie in movies" 
         :key="movie.id">
         <div class="movie-item-image-wrapper">
           <img :src="movie.image" class="movie-item-image">
@@ -35,7 +39,11 @@
           <div class="movie-item-rating-wrapper">
             <span class="movie-item-rating-text"> Rating: ({{movie.rating}}/5) </span>
             <div class="movie-item-star-icon-wrapper">
-              <button class="movie-item-star-icon-button" v-for="i in 5">
+              <button class="movie-item-star-icon-button" 
+                v-for="i in 5"
+                :key="i"
+                @click="setRating(movie, i)"
+                >
                 <StarIcon 
                   :class="{
                     'text-yellow-500': i <= movie.rating, 
