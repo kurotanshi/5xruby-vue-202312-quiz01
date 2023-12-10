@@ -8,12 +8,20 @@
   import { StarIcon } from "@heroicons/vue/24/solid";
   import { items } from "./movies.json";
 
-  const movies = ref(items);
-  const changeRating = ((moviesIndex, star) => {
-    console.log('star',star);
+  const movies = ref(items);    //接收電影資料
+  const starHover = ref(0);     //hovered star 數量
+
+  const mouseover = ((star) => {
+    starHover.value = star;
+  })
+  const mouseout = (() => {
+    starHover.value = 0;
+  })
+  const changeRating = ((moviesIndex) => {
+    console.log('starHover', starHover.value);
     console.log('moviesIndex',moviesIndex -1);
     console.log(movies.value[moviesIndex - 1].rating);
-    movies.value[moviesIndex - 1].rating = star;
+    movies.value[moviesIndex - 1].rating = starHover.value;
   })
 </script>
 
@@ -44,9 +52,15 @@
               <button class="movie-item-star-icon-button" 
                       v-for="(star) in 5" 
                       :key="star" 
-                      :class="star <= movie.rating ? 'text-yellow-500' : 'text-gray-500'" 
-                      :value="star"
-                      @click="changeRating(movie.id, star)">
+                      :class="[
+                        star <= movie.rating ? 'text-yellow-500' : 'text-gray-500', 
+
+                        star <= starHover ? 'text-yellow-500' : 'text-gray-500'
+                      ]" 
+                      @click="changeRating(movie.id, star)"
+
+                      @mouseover="mouseover(star)"
+                      @mouseout="mouseout()">
                 <StarIcon class="movie-item-star-icon"/>
               </button>
           </div>
