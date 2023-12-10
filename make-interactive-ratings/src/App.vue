@@ -9,10 +9,14 @@
   import { items } from "./movies.json";
 
   const movies = ref(items);
+  const hoverIndices = ref({});
+  movies.value.forEach(movie => hoverIndices.value[movie.id] = -1);
   const setRating = (movie, newRating) => {
     const movieToUpdate = movies.value.find(m => m.id === movie.id);
     if (movieToUpdate) movieToUpdate.rating = newRating;
   };
+
+  const setHoverIndex = (movie, i) => hoverIndices.value[movie] = i;
 </script>
 
 <template>
@@ -43,11 +47,13 @@
                 v-for="i in 5"
                 :key="i"
                 @click="setRating(movie, i)"
+                @mouseover="setHoverIndex(movie.id, i)"
+                @mouseleave="setHoverIndex(movie.id, -1)"
                 >
                 <StarIcon 
                   :class="{
-                    'text-yellow-500': i <= movie.rating, 
-                    'text-gray-500': i > movie.rating
+                    'text-yellow-500': i <= movie.rating || i <= hoverIndices[movie.id], 
+                    'text-gray-500': i > movie.rating || i > hoverIndices[movie.id]
                   }"
                   class="movie-item-star-icon" />
               </button>
