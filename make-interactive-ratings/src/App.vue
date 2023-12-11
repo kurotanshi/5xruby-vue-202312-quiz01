@@ -8,20 +8,31 @@
   import { StarIcon } from "@heroicons/vue/24/solid";
   import { items } from "./movies.json";
 
-  const movies = ref(items);    //接收電影資料
-  const starHover = ref(0);     //hovered star 數量
+  const movies = ref(items);                                        //電影正本
+  // const starSelect = ref(0);                                        //hovered 星星總數
+  
+  const copyMovies = ref(JSON.parse(JSON.stringify(movies.value))); //電影副本
+  console.log(copyMovies.value[0]); 
 
-  const mouseover = ((star) => {
-    starHover.value = star;
+  copyMovies.value.forEach(element => {                             //電影副本添加屬性starHover
+    element.starHover = 0;
+    console.log('foreach element', element.starHover);
+  });
+
+  const mouseover = ((moviesIndex, star) => {                                    //hover:
+    console.log('[hover]星星數',star);
+    console.log('[hover]電影資料 array index', moviesIndex - 1);
+    copyMovies.value[moviesIndex - 1].starHover = star;
+    console.log("copyMovies.value[moviesIndex - 1].starHover", copyMovies.value[moviesIndex - 1].starHover);
   })
-  const mouseout = (() => {
-    starHover.value = 0;
+  const mouseout = ((moviesIndex) => {                                         //unHover:
+    copyMovies.value[0].starHover = 0;
   })
-  const changeRating = ((moviesIndex) => {
-    console.log('starHover', starHover.value);
-    console.log('moviesIndex',moviesIndex -1);
-    console.log(movies.value[moviesIndex - 1].rating);
-    movies.value[moviesIndex - 1].rating = starHover.value;
+  const changeRating = ((moviesIndex, star) => {
+    console.log('[點擊]星星數', star);
+    console.log('[點擊]電影資料 array index',moviesIndex -1);
+    copyMovies.value[moviesIndex - 1].rating = star;
+    console.log('[點擊]電影評分',movies.value[moviesIndex - 1].rating);
   })
 </script>
 
@@ -29,7 +40,7 @@
 <div class="app">
   <!--v-for?star狀態-->
   <div class="movie-list">
-    <div class="movie-item" v-for="(movie) in movies" :key="movie.id">
+    <div class="movie-item" v-for="(movie) in copyMovies" :key="movie.id">
       <div class="movie-item-image-wrapper">
         <img :src="movie.image" alt="">
       </div>
@@ -58,9 +69,8 @@
                         star <= starHover ? 'text-yellow-500' : 'text-gray-500'
                       ]" 
                       @click="changeRating(movie.id, star)"
-
-                      @mouseover="mouseover(star)"
-                      @mouseout="mouseout()">
+                      @mouseover="mouseover(movie.id, star)"
+                      @mouseout="mouseout(movie.id)">
                 <StarIcon class="movie-item-star-icon"/>
               </button>
           </div>
