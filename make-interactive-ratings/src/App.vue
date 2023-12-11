@@ -9,7 +9,6 @@
   import { items } from "./movies.json";
 
   const movies = ref(items);                                        //電影正本
-  // const starSelect = ref(0);                                        //hovered 星星總數
   
   const copyMovies = ref(JSON.parse(JSON.stringify(movies.value))); //電影副本
   console.log(copyMovies.value[0]); 
@@ -19,13 +18,13 @@
     console.log('foreach element', element.starHover);
   });
 
-  const mouseover = ((moviesIndex, star) => {                                    //hover:
+  const mouseover = ((moviesIndex, star) => {                       //hover:
     console.log('[hover]星星數',star);
     console.log('[hover]電影資料 array index', moviesIndex - 1);
     copyMovies.value[moviesIndex - 1].starHover = star;
-    console.log("copyMovies.value[moviesIndex - 1].starHover", copyMovies.value[moviesIndex - 1].starHover);
+    console.log("[hover]星星顯示數", copyMovies.value[moviesIndex - 1].starHover);
   })
-  const mouseout = ((moviesIndex) => {                                         //unHover:
+  const mouseout = ((moviesIndex) => {                              //unHover:
     copyMovies.value[0].starHover = 0;
   })
   const changeRating = ((moviesIndex, star) => {
@@ -66,7 +65,7 @@
                       :class="[
                         star <= movie.rating ? 'text-yellow-500' : 'text-gray-500', 
 
-                        star <= starHover ? 'text-yellow-500' : 'text-gray-500'
+                        star <= movie.starHover ? 'text-yellow-500' : 'text-gray-500'
                       ]" 
                       @click="changeRating(movie.id, star)"
                       @mouseover="mouseover(movie.id, star)"
