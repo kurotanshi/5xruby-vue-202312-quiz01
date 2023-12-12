@@ -12,10 +12,11 @@
   // sbi：場站目前車輛數量、 sarea：場站區域(中文)、 mday：資料更新時間、
   // lat：緯度、 lng：經度、 ar：地(中文)、 sareaen：場站區域(英文)、
   // snaen：場站名稱(英文)、 aren：地址(英文)、 bemp：空位數量、 act：全站禁用狀態
-
+  const temp = ref(false);
   const uBikeStops = ref([]);                           //接收資料庫站點資料
   const searchInput = ref("");                          //接收使用者輸入值
-  const isAscending = ref(false);                       //是否升冪
+  const sortBike = ref(false);                    //可用車輛sort被點擊                
+  const sortParking = ref(false);                     //總停車格sort被點擊
 
   fetch('https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json')
     .then(res => res.text())
@@ -23,45 +24,48 @@
       uBikeStops.value = JSON.parse(data);
     });
   
-  const filUBikeStops = computed(()=>{                  //關鍵字篩選結果
-    return uBikeStops.value.filter((stop)=>{
-      return stop.sna.indexOf(searchInput.value) !== -1;
-    })
-  })
   
-  // const sortFilUBikeStops = computed(()=>{  //篩選結果的資料排序
-  //               //篩選結果的資料排序
-  //   // if(filUBikeStops.value.length != 0){
-  //   //   let arr = Array.from(filUBikeStops.value);
-  //   // }
-  //   let arr = ref([]);
-  //   if (filUBikeStops.value.length != 0) {
-  //     arr = Array.from(filUBikeStops.value);
-  //   }
+  const filUBikeStops = computed(()=>{    
     
-
-  //   arr = arr.slice().sort((a, b) => {
-  //     return a.sbi - b.sbi;
-  //   });
-  //   return arr;
-  //   // arr = arr.value.filter((p)=>{
-  //   //   return p.sbi === 3;
-  //   // })
-  //   // console.log(arr);
+    let arr = ref([]);
     
-  // })
+    //篩選關鍵字
+    arr = uBikeStops.value.filter((stop)=>{
+      return stop.sna.indexOf(searchInput.value) !== -1;
+    });
 
-  // const sort = (()=>{
-  //   filUBikeStops.value = filUBikeStops.value.slice().sort((a, b) => {
-  //     return a.sbi - b.sbi;
-  //   })
-  // })
+    //如果”可用車輛“被點擊
+    if (sortBike.value == true) {
+      arr = arr.slice().sort((a, b) => {
+        return a.sbi - b.sbi;
+      });
+    }
+    if (sortBike.value == false) {
+      arr = arr.slice().sort((a, b) => {
+        return b.sbi - a.sbi;
+      });
+    }
+    
+    //如果“總停車格”被點擊
+    if (sortParking.value == true) {
+      arr = arr.slice().sort((a, b) => {
+        return a.tot - b.tot;
+      });
+    }
+    if (sortParking.value == false) {
+      arr = arr.slice().sort((a, b) => {
+        return b.tot - a.tot;
+      });
+    }
+
+    return arr;
+  });
+
+  
+  
 
 
-
-
-  const timeFormat = (val) => {
-    // 時間格式
+  const timeFormat = (val) => {               // 時間格式
     const pattern = /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/;
     return val.replace(pattern, '$1/$2/$3 $4:$5:$6');
   };
@@ -72,7 +76,6 @@
     <p>
       站點名稱搜尋: <input type="text" v-model="searchInput">
     </p>
-    
 
     <table class="table table-striped">
       <thead>
@@ -80,11 +83,11 @@
           <th>#</th>
           <th>場站名稱</th>
           <th>場站區域</th>
-          <th @click="sort()" style="cursor:pointer;">目前可用車輛
+          <th @click="sortBike = !sortBike" style="cursor:pointer;">目前可用車輛
             <i class="fa fa-sort-asc" aria-hidden="true"></i>
             <i class="fa fa-sort-desc" aria-hidden="true"></i>
           </th>
-          <th  style="cursor:pointer;">總停車格
+          <th @click="sortParking = !sortParking" style="cursor:pointer;">總停車格
             <i class="fa fa-sort-asc" aria-hidden="true"></i>
             <i class="fa fa-sort-desc" aria-hidden="true"></i>
           </th>
