@@ -14,6 +14,7 @@ import { ref, computed, watch } from 'vue';
 // snaen：場站名稱(英文)、 aren：地址(英文)、 bemp：空位數量、 act：全站禁用狀態
 
 const uBikeStops = ref([]);
+const search = ref('');
 
 fetch('https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json')
   .then(res => res.text())
@@ -26,12 +27,23 @@ const timeFormat = (val) => {
   const pattern = /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/;
   return val.replace(pattern, '$1/$2/$3 $4:$5:$6');
 };
+
+const filteredUBikeStops = computed(() => {
+  if (search.value) {
+    return uBikeStops.value.filter(stop => 
+      stop.sna.includes(search.value)
+    );
+  } else {
+    return uBikeStops.value;
+  }
+});
+
 </script>
 
 <template>
 <div class="app">
   <p>
-    站點名稱搜尋: <input type="text">
+    站點名稱搜尋: <input type="text" v-model="search" />
   </p>
 
 <nav>
@@ -56,7 +68,7 @@ const timeFormat = (val) => {
   <table class="table table-striped">
     <thead>
       <tr>
-        <th>#</th>
+        <th></th>
         <th>場站名稱</th>
         <th>場站區域</th>
         <th>目前可用車輛
@@ -71,7 +83,7 @@ const timeFormat = (val) => {
       </tr>
     </thead>
     <tbody>
-      <tr v-for="s in uBikeStops" :key="s.sno">
+      <tr v-for="s in filteredUBikeStops" :key="s.sno">
         <td>{{ s.sno }}</td>
         <td>{{ s.sna }}</td>
         <td>{{ s.sarea }}</td>
