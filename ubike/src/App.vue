@@ -15,6 +15,8 @@ import { ref, computed, watch } from 'vue';
 
 const uBikeStops = ref([]);
 const search = ref('');
+const sortField = ref('');
+const sortOrder = ref('asc');
 
 fetch('https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json')
   .then(res => res.text())
@@ -29,15 +31,33 @@ const timeFormat = (val) => {
 };
 
 const filteredUBikeStops = computed(() => {
+  let result = uBikeStops.value;
+
   if (search.value) {
-    return uBikeStops.value.filter(stop => 
-      stop.sna.includes(search.value)
-    );
-  } else {
-    return uBikeStops.value;
+    result = result.filter(stop => stop.sna.includes(search.value));
   }
+
+  if (sortField.value) {
+    result = [...result].sort((a, b) => {
+      if (sortOrder.value === 'asc') {
+        return a[sortField.value] > b[sortField.value] ? 1 : -1;
+      }else {
+        return a[sortField.value] < b[sortField.value] ? 1 : -1;
+      }
+    });
+  }
+
+  return result;
 });
 
+const sortStops = (field) => {
+  if (sortField.value === field) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortField.value = field;
+    sortOrder.value = 'asc';
+  }
+}
 </script>
 
 <template>
@@ -71,11 +91,11 @@ const filteredUBikeStops = computed(() => {
         <th></th>
         <th>場站名稱</th>
         <th>場站區域</th>
-        <th>目前可用車輛
+        <th @click="sortStops('sbi')">目前可用車輛
           <i class="fa fa-sort-asc" aria-hidden="true"></i>
           <i class="fa fa-sort-desc" aria-hidden="true"></i>
         </th>
-        <th>總停車格
+        <th @click="sortStops('tot')">總停車格
           <i class="fa fa-sort-asc" aria-hidden="true"></i>
           <i class="fa fa-sort-desc" aria-hidden="true"></i>
         </th>
