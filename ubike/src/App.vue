@@ -14,6 +14,9 @@ import { ref, computed, watch } from 'vue';
 // snaen：場站名稱(英文)、 aren：地址(英文)、 bemp：空位數量、 act：全站禁用狀態
 
 const uBikeStops = ref([]);
+const search = ref('');
+const sortField = ref('');
+const sortOrder = ref('asc');
 
 fetch('https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json')
   .then(res => res.text())
@@ -26,12 +29,41 @@ const timeFormat = (val) => {
   const pattern = /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/;
   return val.replace(pattern, '$1/$2/$3 $4:$5:$6');
 };
+
+const filteredUBikeStops = computed(() => {
+  let result = uBikeStops.value;
+
+  if (search.value) {
+    result = result.filter(stop => stop.sna.includes(search.value));
+  }
+
+  if (sortField.value) {
+    result = [...result].sort((a, b) => {
+      if (sortOrder.value === 'asc') {
+        return a[sortField.value] > b[sortField.value] ? 1 : -1;
+      }else {
+        return a[sortField.value] < b[sortField.value] ? 1 : -1;
+      }
+    });
+  }
+
+  return result;
+});
+
+const sortStops = (field) => {
+  if (sortField.value === field) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortField.value = field;
+    sortOrder.value = 'asc';
+  }
+}
 </script>
 
 <template>
 <div class="app">
   <p>
-    站點名稱搜尋: <input type="text">
+    站點名稱搜尋: <input type="text" v-model="search" />
   </p>
 
 <nav>
@@ -56,14 +88,14 @@ const timeFormat = (val) => {
   <table class="table table-striped">
     <thead>
       <tr>
-        <th>#</th>
+        <th></th>
         <th>場站名稱</th>
         <th>場站區域</th>
-        <th>目前可用車輛
+        <th @click="sortStops('sbi')">目前可用車輛
           <i class="fa fa-sort-asc" aria-hidden="true"></i>
           <i class="fa fa-sort-desc" aria-hidden="true"></i>
         </th>
-        <th>總停車格
+        <th @click="sortStops('tot')">總停車格
           <i class="fa fa-sort-asc" aria-hidden="true"></i>
           <i class="fa fa-sort-desc" aria-hidden="true"></i>
         </th>
@@ -71,7 +103,7 @@ const timeFormat = (val) => {
       </tr>
     </thead>
     <tbody>
-      <tr v-for="s in uBikeStops" :key="s.sno">
+      <tr v-for="s in filteredUBikeStops" :key="s.sno">
         <td>{{ s.sno }}</td>
         <td>{{ s.sna }}</td>
         <td>{{ s.sarea }}</td>
