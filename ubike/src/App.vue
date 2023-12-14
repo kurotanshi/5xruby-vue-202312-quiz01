@@ -12,49 +12,63 @@
   // sbi：場站目前車輛數量、 sarea：場站區域(中文)、 mday：資料更新時間、
   // lat：緯度、 lng：經度、 ar：地(中文)、 sareaen：場站區域(英文)、
   // snaen：場站名稱(英文)、 aren：地址(英文)、 bemp：空位數量、 act：全站禁用狀態
-  const temp = ref(false);
-  const uBikeStops = ref([]);                           //接收資料庫站點資料
-  const searchInput = ref("");                          //接收使用者輸入值
   
-  const ubike = ref(false);                         //可用車輛sort被點擊                
-  const sortParking = ref(false);                   //總停車格sort被點擊
-
-  const tableSelect = ref('');  //紀錄選中的 table head
-  const tableCode = ref('');    //table head code
-  const direction = ref(false);
+  /*===============
+    接收資料庫站點資料
+  ================*/
+  const uBikeStops = ref([]); 
 
   fetch('https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json')
-    .then(res => res.text())
-    .then(data => {
-      uBikeStops.value = JSON.parse(data);
+  .then(res => res.text())
+  .then(data => {
+    uBikeStops.value = JSON.parse(data);
   });
   
-  const itableCode = ref(tableCode.value);
-  console.log('itableCode',itableCode.value);
+  /*====================
+    搜集點擊的 table head
+  ====================*/
+  const tableSelect = ref('');  //紀錄選中的 table head
+  const tableCode = ref('');    //紀錄 onClick 後 table head code
+  const direction = ref(false); //true:升冪a-b, false:降冪b-a
   
-  //搜集點擊的 table head
-  const selectTable = ((tableName) => {
+  /**
+   * Function selectTableHead
+   * 會接收到使用者點擊到 table head 的名稱
+   * 並依返回的名稱設定 tableCode.value
+   * 同時反轉 tableSelect 的值
+   * 
+   * @param {string}tableName - 帶入table名稱
+   */
+  const selectTableHead = (tableName) => {
     tableSelect.value = tableName;
+    direction.value = !direction.value;
     if (tableSelect.value == 'bikes') {
       tableCode.value = 'sbi'
     } else if (tableSelect.value == 'space') {
       tableCode.value = 'tot'
     }
-    // console.log(tableSelect.value);
-  })
+    console.log('direction.value', direction.value);
+  }
 
-  const sortResult = ((tableCode) => {
+  
+  /*======================
+    計算屬性 - 計算過濾後的值
+  ======================*/
+  const searchInput = ref(""); //搜集input資料
 
-    if (condition) {
-
-    }
-
-    return direction === true ?
+  /**
+   * Function sortDirection
+   * 帶入 tableCode 參數
+   * 判斷 direction 的值並返回 .sort 用的參數
+   * 
+   * @param {string}tableCode - 輸入table名稱
+   * @return - 返回.sort 用的參數
+   */
+  const sortDirection = (tableCode) => {
+    return direction.value === true ?
       (a, b) => a[tableCode] - b[tableCode] :
-      (a, b) => b[tableCode] - c[tableCode]
-
-  })
-
+      (a, b) => b[tableCode] - a[tableCode]
+  }
   const filUBikeStops = computed(()=>{    
     
     let arr = ref([]);
@@ -62,65 +76,17 @@
       console.log('tableCode.value 有值進來了',tableCode.value);
     }
     
-    
     //篩選關鍵字
     arr = uBikeStops.value.filter((stop)=>{
       return stop.sna.indexOf(searchInput.value) !== -1;
     });
 
-    
-    
+    //排序
+    arr = uBikeStops.value.sort(sortDirection(tableCode.value));
 
     return arr;
   });
 
-  
-
-  //如果”可用車輛“被點擊
-  // if (sortBike.value == true) {
-  //   arr = arr.slice().sort((a, b) => {
-  //     return a.sbi - b.sbi;
-  //   });
-  // } else {
-  //   arr = arr.slice().sort((a, b) => {
-  //     return b.sbi - a.sbi;
-  //   });
-  // }
-
-
-  // arr = arr.slice().sortResult(tableCode.value);
-
-  //如果”可用車輛“被點擊
-  // watch (sortBike, (value)=>{
-  //   console.log('watch',value);
-  //   if (value == true) {
-  //     filUBikeStops = filUBikeStops.value.slice().sort((a, b) => {
-  //       return a.sbi - b.sbi;
-  //     });
-  //   }
-  //   if (value == false) {
-  //     filUBikeStops = filUBikeStops.value.slice().sort((a, b) => {
-  //       return b.sbi - a.sbi;
-  //     });
-  //   }
-  // })
-
-  //如果“總停車格”被點擊
-  // watch(sortParking, (value) => {
-  //   console.log('watch', value);
-  //   if (value == true) {
-  //     filUBikeStops = filUBikeStops.value.slice().sort((a, b) => {
-  //       return a.tot - b.tot;
-  //     });
-  //   }
-  //   if (value == false) {
-  //     filUBikeStops = filUBikeStops.value.slice().sort((a, b) => {
-  //       return b.tot - a.tot;
-  //     });
-  //   }
-  // })
-
-  
   
   const timeFormat = (val) => {               // 時間格式
     const pattern = /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/;
@@ -140,11 +106,11 @@
           <th>#</th>
           <th>場站名稱</th>
           <th>場站區域</th>
-          <th @click="selectTable('bikes')" style="cursor:pointer;">目前可用車輛
+          <th @click="selectTableHead('bikes')" style="cursor:pointer;">目前可用車輛
             <i class="fa fa-sort-asc" aria-hidden="true"></i>
             <i class="fa fa-sort-desc" aria-hidden="true"></i>
           </th>
-          <th @click="selectTable('space')" style="cursor:pointer;">總停車格
+          <th @click="selectTableHead('space')" style="cursor:pointer;">總停車格
             <i class="fa fa-sort-asc" aria-hidden="true"></i>
             <i class="fa fa-sort-desc" aria-hidden="true"></i>
           </th>
