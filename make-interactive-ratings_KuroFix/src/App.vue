@@ -14,21 +14,19 @@
   console.log(copyMovies.value[0]); 
 
   copyMovies.value.forEach(element => {                             //電影副本添加屬性starHover
-    element.starHover = element.rating; 
-    //Kuro:是用來表示亮燈與否，跟實際的分數不相關
-    //所以這裡的預設值一開始就可以讓他吃 rating 而不是零
+    element.starHover = 0;
     console.log('foreach element', element.starHover);
   });
 
-  // const mouseover = ((moviesIndex, star) => {                       //hover: Kuro:這兩個就用不到了
-  //   console.log('[hover]星星數',star);
-  //   console.log('[hover]電影資料 array index', moviesIndex - 1);
-  //   copyMovies.value[moviesIndex - 1].starHover = star;
-  //   console.log("[hover]星星顯示數", copyMovies.value[moviesIndex - 1].starHover);
-  // })
-  // const mouseout = ((moviesIndex) => {                              //unHover: Kuro:這兩個就用不到了
-  //   copyMovies.value[0].starHover = 0;
-  // })
+  const mouseover = ((moviesIndex, star) => {                       //hover:
+    console.log('[hover]星星數',star);
+    console.log('[hover]電影資料 array index', moviesIndex - 1);
+    copyMovies.value[moviesIndex - 1].starHover = star;
+    console.log("[hover]星星顯示數", copyMovies.value[moviesIndex - 1].starHover);
+  })
+  const mouseout = ((moviesIndex) => {                              //unHover:
+    copyMovies.value[0].starHover = 0;
+  })
   const changeRating = ((moviesIndex, star) => {
     console.log('[點擊]星星數', star);
     console.log('[點擊]電影資料 array index',moviesIndex -1);
