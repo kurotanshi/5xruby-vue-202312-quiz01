@@ -18,6 +18,8 @@ const searchInput = ref('');
 const sort = ref(0); //1: 升序 2: 降序
 const sortType = ref('');
 
+// const totoalPages = ref(0);
+
 fetch('https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json')
   .then(res => res.text())
   .then(data => {
@@ -35,7 +37,7 @@ const filteredUBikeStops = computed(()=> {
   const filterResult = uBikeStops.value.length === 0 ? [] : uBikeStops.value.filter(item => item.sna.toLowerCase().includes(searchInput.value.toLowerCase()));
   if(sort.value){
     filterResult.sort((a, b) => {
-      // console.log(sort.value);
+
       if(sortType.value === 'sbi'){
         // console.log(sortType.value);
         // console.log(sort.value);
@@ -51,6 +53,13 @@ const filteredUBikeStops = computed(()=> {
   
   return filterResult;
 });
+
+const pagination = computed(() => {
+  const pageLimit = 20;
+  totoalPages.value = Math.ceil(filteredUBikeStops.value.length / pageLimit);
+
+  console.log(totoalPages.value);
+})
 </script>
 
 <template>
@@ -66,7 +75,7 @@ const filteredUBikeStops = computed(()=> {
     </li>
 
     <li
-      v-for="i in 10" :key="i"
+      v-for="i in 20" :key="i"
       class="page-item">
       <span class="page-link">{{ i }}</span>
     </li>
