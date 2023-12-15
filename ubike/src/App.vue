@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, watch } from 'vue';
+  import { ref, computed } from 'vue';
 
   // 修改這份 YouBike 即時資訊表，並加上
   // 1. 站點名稱搜尋
@@ -65,9 +65,11 @@
    * @return - 返回.sort 用的參數
    */
   const sortDirection = (tableCode) => {
-    return direction.value === true ?
+    if (typeof tableCode === 'string') {
+      return direction.value === true ?
       (a, b) => a[tableCode] - b[tableCode] :
       (a, b) => b[tableCode] - a[tableCode]
+    }
   }
   const filUBikeStops = computed(()=>{    
     
@@ -82,7 +84,7 @@
     });
 
     //排序
-    arr = uBikeStops.value.sort(sortDirection(tableCode.value));
+    arr = arr.sort(sortDirection(tableCode.value));
 
     return arr;
   });
