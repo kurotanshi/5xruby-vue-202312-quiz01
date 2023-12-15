@@ -13,15 +13,15 @@ const movies = ref(items);
 // console.log(movies.value[2].rating);
 
 
-const toggleStar = (id, stars) => {
-  
-  for (let i = 0; i < movies.value.length; i++) {
-    if (movies.value[i].id === id) {
-        movies.value[i].rating = stars;
+const toggleStar = (movie, stars) => {
+  movie.rating = stars;
+ // for (let i = 0; i < movies.value.length; i++) {
+   // if (movies.value[i].id === id) {
+    //    movies.value[i].rating = stars;
         // console.log(movies.value[i].id);
         // console.log(movies.value[i].rating);
-      }
-    }
+    //  }
+   // }
 }
 
 
@@ -52,7 +52,7 @@ const toggleStar = (id, stars) => {
           <span class="movie-item-rating-text"> Rating: ({{movie.rating}}/5) </span>
           
           <div class="movie-item-star-icon-wrapper">
-            <button v-for="star in 5" :key="star" @click="toggleStar(movie.id, star)" class=" movie-item-star-icon-button">
+            <button v-for="star in 5" :key="star" @click="toggleStar(movie, star)" class=" movie-item-star-icon-button">
               <StarIcon :class="movie.rating >= star ? 'text-yellow-500' : 'text-gray-500'" class="movie-item-star-icon" />
             </button>
           </div>
