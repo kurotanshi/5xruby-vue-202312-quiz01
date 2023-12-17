@@ -26,6 +26,7 @@ const start = ref(1);
 const end = ref(1);
 
 
+
 fetch('https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json')
   .then(res => res.text())
   .then(data => {
